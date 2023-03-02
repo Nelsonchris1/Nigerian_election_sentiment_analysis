@@ -1,8 +1,9 @@
 import logging
 import logging.config
 from datetime import datetime
-from typing import List
 from os import path
+from typing import List
+
 import pandas as pd
 import snscrape.modules.twitter as sntwitter
 
@@ -23,38 +24,27 @@ def setup_logging():
     )
 
 
-def pull_data(until: str, since: str) -> pd.DataFrame:
-
-
-    query = {
-        "peter_obi": f"peter obi labour party -tinubu -atiku until:{until} since:{since}",
-        "tinubu": f"tinubu apc -peter -obi -atiku -labour -party -PETER -OBI -Peter until:{until} since:{since}",
-        "atiku": f"atiku pdp -peter -obi -tinubu -Tinubu -labour -party -PETER -OBI -Peter until:{until} since:{since}",
-    }
+def pull_data(query:str, file_name: str) -> pd.DataFrame:
 
     tweets = []
 
     limit = 10000
-    for k, v in query.items():
-        for tweet in sntwitter.TwitterSearchScraper(v).get_items():
+    for tweet in sntwitter.TwitterSearchScraper(query).get_items():
             if len(tweets) == limit:
                 break
             else:
                 tweets.append(
                     [
                         tweet.date,
-                        tweet.user,
                         tweet.sourceLabel,
-                        tweet.content,
-                        tweet.coordinates,
-                        tweet.place,
+                        tweet.rawContent,
                     ]
                 )
 
-        df = pd.DataFrame(
-            tweets, columns=["Date", "User", "Tweets", "Device", "Coordinates", "Place"]
+    df = pd.DataFrame(
+            tweets, columns=["Date", "Device", "Tweets"]
         )
-        df.to_csv(f"data/election_{k}_{until}.csv", index=False)
+    df.to_csv(f"data/election_{file_name}.csv", index=False)
         
 
 
@@ -62,6 +52,17 @@ if __name__ == "__main__":
     setup_logging()
     logger = logging.getLogger(__name__)
 
+    query1 = "peter obi labour party -tinubu -atiku until:2023-02-25 since:2023-02-21"
+    query2 = "tinubu apc -peter -obi -atiku -labour -party -PETER -OBI -PeterObi -Peter until:2023-02-25 since:2023-02-21"
+    query3 = "atiku pdp -peter -obi -tinubu -Tinubu -labour -party -PETER -PeterObi -OBI -Peter until:2023-02-25 since:2023-02-21"
+
     logging.info("Starting Extraction")
-    pull_data(until="2023-02-26", since="2023-02-21")
-    logging.info("Done extracting")
+    pull_data(query=query1, file_name="peter_obi")
+    logging.info("Done extracting peter obi")
+
+    pull_data(query=query2, file_name="tinubu")
+    logging.info("Done extracting tinubu")
+
+    pull_data(query=query3, file_name="atiku")
+    logging.info("Done extracting atiku")
+    logging.info("Done extracting all files")
