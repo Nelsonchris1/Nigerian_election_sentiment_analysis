@@ -1,4 +1,4 @@
-#Sentiment Analysis of Nigerian Presidential Election using Twitter Data
+# Sentiment Analysis of Nigerian Presidential Election using Twitter Data
 
 ## Introduction
 This project is a sentiment analysis of tweets related to the Nigerian presidential election, focusing on the three main presidential candidates. The aim of the project is to analyze the sentiment of Twitter users towards the candidates and determine which candidate is most favored by the Twitter community.
